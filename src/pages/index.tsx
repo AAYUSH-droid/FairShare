@@ -1,23 +1,28 @@
-import { Inter } from "next/font/google";
+import { type NextPage } from "next";
 import Head from "next/head";
 import clx from "classnames";
-import { useEffect, useState } from "react";
+
+import { ItemForm, PeopleInput, ThemeSwitch, TableResults } from "@components";
+import { FormProvider } from "../context/Form";
+import { PeopleProvider } from "../context/PeopleContext";
 import { useTheme } from "../context/ThemeContext";
+import { useEffect, useState } from "react";
+import Script from "next/script";
 
-const inter = Inter({ subsets: ["latin"] });
-
-export default function Home() {
+const NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID =
+  process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID;
+const Home: NextPage = () => {
   const { theme } = useTheme();
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
   return (
     <div className={clx({ dark: theme === "dark" })}>
       <Head>
-        {" "}
-        <title>Fair Share | Bill Calculator</title>{" "}
+        <title>Fair Share | Bill Calculator</title>
         <meta
           name="description"
           content="Split the bill between friends with ease."
@@ -53,7 +58,22 @@ export default function Home() {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-
+      <Script
+        strategy="afterInteractive"
+        src={`https://www.googletagmanager.com/gtag/js?id=${
+          NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID || ""
+        }`}
+      />
+      <Script id="google-analytics" strategy="afterInteractive">
+        {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID || ""}', {
+                page_path: window.location.pathname,
+            });
+            `}
+      </Script>
       <main className="flex min-h-screen flex-col items-center bg-white dark:bg-black">
         <div className="container flex max-w-2xl flex-col items-center justify-center gap-12 px-4 py-16 ">
           <div className="flex w-full items-center justify-between">
@@ -63,9 +83,21 @@ export default function Home() {
                 Share
               </span>
             </h1>
+            <ThemeSwitch />
           </div>
+          <PeopleProvider>
+            {isMounted && (
+              <FormProvider>
+                <PeopleInput />
+                <ItemForm />
+                <TableResults />
+              </FormProvider>
+            )}
+          </PeopleProvider>
         </div>
       </main>
     </div>
   );
-}
+};
+
+export default Home;

@@ -23,7 +23,7 @@ const cache: Record<string, unknown> = {};
 const fetching: Record<string, boolean> = {};
 
 export const useCurrency = () => {
-  const [currencySymbol, setCurrencySymbol] = useState("€");
+  const [currencySymbol, setCurrencySymbol] = useState("₹");
   const [currency, setCurrency] = useState("EUR");
   const timezone = useMemo(
     () => Intl.DateTimeFormat().resolvedOptions().timeZone,
